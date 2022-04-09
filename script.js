@@ -1,5 +1,6 @@
 ;(() => {
-    const baseUrl = `https://api.themoviedb.org/3/movie`
+    const BASE_URL = `https://api.themoviedb.org/3`
+    const IMAGE_URL = `https://image.tmdb.org/t/p/original/`
     const API_KEY = `07036e269117ca0c291018d3f93821cc`
     const default_langs = 'ko'
 
@@ -16,7 +17,7 @@
                 let image = document.createElement('img')
                 let title = document.createElement('p')
                 if(element.poster_path !== null) {
-                    image.setAttribute('src',`https://image.tmdb.org/t/p/original/${element.poster_path}`)
+                    image.setAttribute('src',`${IMAGE_URL}${element.poster_path}`)
                     image.style.width = '200px'
                     image.style.height = '300px'
                     title.innerHTML = element.title
@@ -195,7 +196,7 @@
         let temp = document.createDocumentFragment()
         
         for (let i = 0; i < genreNums.length; i++) {
-            let img = 'https://image.tmdb.org/t/p/original/' + genreNums[i].backdrop_path
+            let img = IMAGE_URL + genreNums[i].backdrop_path
             
             let carousel_item = document.createElement('div')
             carousel_item.classList.add('carousel_item')
@@ -215,11 +216,11 @@
     const getMovie = (searchType) => {
         let url = ''
         if(searchType === 'trand') {
-            url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=${default_langs}&page=1`
+            url = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=${default_langs}&page=1`
         } else if(searchType === 'popular' || searchType === 'upcoming'){
-            url = `${baseUrl}/${searchType}?api_key=${API_KEY}&language=${default_langs}&page=1`
+            url = `${BASE_URL}/movie/${searchType}?api_key=${API_KEY}&language=${default_langs}&page=1`
         } else {
-            url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=ko&include_adult=true&page=1&query=${searchType}`
+            url = `${BASE_URL}/search/movie?api_key=${API_KEY}&language=ko&include_adult=true&page=1&query=${searchType}`
             
         }
         
@@ -265,7 +266,7 @@
         let movie_infos = document.createElement('div')
 
         let str = `<div class=left-side>
-            <img class="info-img" src="https://image.tmdb.org/t/p/original/${movieInfo.poster_path}" alt="영화포스터">
+            <img class="info-img" src="${IMAGE_URL}${movieInfo.poster_path}" alt="영화포스터">
         </div>`
         
         str += '<div class="right-side">';
@@ -274,9 +275,9 @@
             str += `<p class="text tagline">${movieInfo.tagline}</p>`
         }
 
-        if(movieInfo.backdrop_path != '') {
+        if(movieInfo.backdrop_path != '' && movieInfo.backdrop_path != null) {
             str += `<div class="img-area">
-                        <img class="backdrop-img" src="https://image.tmdb.org/t/p/original/${movieInfo.backdrop_path}">
+                        <img class="backdrop-img" src="${IMAGE_URL}${movieInfo.backdrop_path}">
                     </div>`
         }
        
@@ -335,7 +336,7 @@
     }
 
     const getGenre = () => {
-        fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}&language=ko`)
+        fetch(`${BASE_URL}/genre/movie/list?api_key=${API_KEY}&language=ko`)
         .then((response) => response.json())
         .then(data => showRandomGenre(data.genres))
     }
@@ -344,7 +345,7 @@
         let genre_id = genre.id
         let randomNum = Math.floor(Math.random() *  100) + 1
         console.log(randomNum)
-        fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=ko&sort_by=popularity.desc&include_adult=true&include_video=false&page=${randomNum}&with_genres=${genre_id}&with_watch_monetization_types=flatrate`)
+        fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&language=ko&sort_by=popularity.desc&include_adult=true&include_video=false&page=${randomNum}&with_genres=${genre_id}&with_watch_monetization_types=flatrate`)
         .then((response) => response.json())
         .then((data) => {
             showPosters(data, genre)
@@ -352,7 +353,7 @@
     }
 
     const getMovieInfo = (movie_id) => {
-        fetch(`${baseUrl}/${movie_id}?api_key=${API_KEY}&language=ko`)
+        fetch(`${BASE_URL}/movie/${movie_id}?api_key=${API_KEY}&language=ko`)
         .then((response) => response.json())
         .then((data) => showMoiveDetails(data))
     }
@@ -411,12 +412,8 @@
 
         document.addEventListener('click', (event) => {
             event.preventDefault()
-
-            let popup_opened = false
-
             if(event.target.closest('li') != undefined) {
                 let id = event.target.closest('li').id
-                popup_opened = true
                 getMovieInfo(id)
             }
 
