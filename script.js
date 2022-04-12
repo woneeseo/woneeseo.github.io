@@ -283,7 +283,6 @@
        
         if(movieInfo.genre != '') {
             let genre = ''
-            console.log(movieInfo.genres)
             movieInfo.genres.forEach((element) => {
                 genre += element.name + ' '
             });
@@ -332,7 +331,6 @@
 
         $info_area.append(movie_title)
         $info_area.append(movie_infos)
-
     }
 
     const getGenre = () => {
@@ -344,7 +342,6 @@
     const getGenreMovie = (genre) => {
         let genre_id = genre.id
         let randomNum = Math.floor(Math.random() *  100) + 1
-        console.log(randomNum)
         fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&language=ko&sort_by=popularity.desc&include_adult=true&include_video=false&page=${randomNum}&with_genres=${genre_id}&with_watch_monetization_types=flatrate`)
         .then((response) => response.json())
         .then((data) => {
@@ -357,12 +354,21 @@
         .then((response) => response.json())
         .then((data) => showMoiveDetails(data))
     }
+
+    const pressEnter = (e) => {
+        if(e.keyCode === 13) {
+            const search_input = document.querySelector('.search-text')
+            getMovie(search_input.value)
+        }
+    }
     
     const init = () => {
         getMovie('popular')
         getMovie('upcoming')
         getMovie('trand')
         getGenre()
+
+        window.addEventListener('keydown', pressEnter)
 
         window.addEventListener('DOMContentLoaded', () => {
             const search_icon = document.querySelector('.fa-solid')
@@ -377,6 +383,11 @@
             modal_searchBtn.addEventListener('click', (event) => {
                 event.preventDefault()
                 result_area.innerHTML = ''
+                if(search_input.value === '') {
+                    alert('검색어를 입력해주세요.')
+                    return
+                }
+
                 getMovie(search_input.value)
             })
             
@@ -398,15 +409,6 @@
                     isClicked = true   
                 }
             })
-
-            let movie_contensts = document.querySelectorAll('.movie-contents')
-            movie_contensts.forEach((element) => {
-                element.addEventListener('scroll', (e) => {
-                    e.preventDefault()
-                    console.log(element.scrollWidth)
-                    console.log(element.scrollWidth - element.scrollLeft)
-                })
-            });
 
         })
 
@@ -430,7 +432,6 @@
                 window.location.reload()
                 window.scrollTo(0, 0)
             })
-            
         })
     }
     
